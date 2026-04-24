@@ -26,9 +26,9 @@ HF_DATASET = "open-index/hacker-news"
 # ---------------------------------------------------------------------------
 # Ingest
 # ---------------------------------------------------------------------------
-
+# Ingest
 MIN_SCORE_THRESHOLD = 5         # Drop posts below this score
-STORY_TYPES = ["story"]         # HN post types to include
+STORY_TYPE = 1                  # HN type code: 1 = story
 
 # ---------------------------------------------------------------------------
 # Attention scoring

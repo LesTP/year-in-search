@@ -6,7 +6,6 @@ Usage:
 """
 
 import argparse
-from datetime import datetime, timezone
 
 import pandas as pd
 
@@ -28,19 +27,23 @@ def load_and_filter(year: int) -> pd.DataFrame:
     ds = load_dataset(config.HF_DATASET, split="train")
     df = ds.to_pandas()
 
-    # Filter to stories
-    df = df[df["type"].isin(config.STORY_TYPES)].copy()
+    # Convert types — HF dataset stores these as strings/ints
+    df["type"] = pd.to_numeric(df["type"], errors="coerce")
+    df["score"] = pd.to_numeric(df["score"], errors="coerce").fillna(0).astype(int)
+    df["descendants"] = pd.to_numeric(df["descendants"], errors="coerce").fillna(0).astype(int)
+
+    # Filter to stories (type=1)
+    df = df[df["type"] == config.STORY_TYPE].copy()
 
     # Parse timestamp and filter to target year
-    df["timestamp"] = pd.to_datetime(df["time"], unit="s", utc=True)
+    df["timestamp"] = pd.to_datetime(df["time"], utc=True)
     df = df[df["timestamp"].dt.year == year].copy()
 
     # Filter by minimum score
     df = df[df["score"] >= config.MIN_SCORE_THRESHOLD].copy()
 
-    # Rename and select columns
+    # Rename and compute attention
     df = df.rename(columns={"descendants": "num_comments"})
-    df["num_comments"] = df["num_comments"].fillna(0).astype(int)
     df["attention"] = df["score"] + config.COMMENT_WEIGHT * df["num_comments"]
 
     columns = ["id", "title", "score", "num_comments", "timestamp", "url", "attention"]
