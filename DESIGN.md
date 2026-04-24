@@ -435,13 +435,66 @@ python -m src.visualize --year 2024
 
 ## 11. Future Extensions (Post-PoC)
 
-- **Multi-source:** Add Reddit, Google Trends, Twitter/X as additional source adapters
 - **Interactive visualization:** Plotly/D3.js version with hover details, drill-down
 - **Automated curation:** LLM-based cluster merging and label generation
 - **Webapp:** Simple Flask/Streamlit app to browse year-in-review by year
-- **Cross-source validation:** Topics that appear across multiple sources get boosted confidence
 - **Embedding upgrade:** Swap to `all-mpnet-base-v2` or OpenAI embeddings if cluster quality is insufficient
 - **Category tagging:** Auto-tag topics (AI, security, languages, infra, etc.) for balanced selection
+
+### 11a. Multi-Source: Reddit Tech Subreddits
+
+**Goal:** Add tech subreddit data as a second attention signal alongside HN. Topics that spike on *both* sources have strong cross-validation. Source-specific spikes reveal community-specific interests (HN = startups/products, Reddit = broader dev community).
+
+**Target subreddits:** `r/programming`, `r/technology`, `r/machinelearning`, `r/webdev`, `r/devops`, `r/rust`, `r/golang`, `r/python`, `r/javascript`
+
+**Data source options:**
+- HuggingFace: Reddit submission dumps (various community datasets)
+- Pushshift/Arctic Shift archives
+- Reddit API (rate-limited, requires auth)
+
+**Schema mapping:**
+
+| HN field      | Reddit equivalent       | Notes                              |
+|---------------|------------------------|------------------------------------|
+| `title`       | `title`                | Direct match                       |
+| `score`       | `score`                | Reddit scores are 10-100x higher   |
+| `descendants` | `num_comments`         | Direct match                       |
+| `time`        | `created_utc`          | Unix timestamp in Reddit           |
+| `type=story`  | subreddit filter        | Filter by target subreddit list    |
+| —             | `subreddit`            | New field: source context          |
+
+**Key design decisions:**
+
+1. **Merge strategy: early (before clustering).** Concatenate HN + Reddit titles into one embedding matrix, cluster together. Add a `source` column so results can be broken down by origin. This is simpler than matching clusters cross-source and lets topics naturally form across both communities.
+
+2. **Attention normalization.** Reddit scores are much higher than HN (a front-page Reddit post might get 5000+ points vs. 500 on HN). Normalize per-source before combining:
+   ```python
+   # Per-source z-score normalization
+   attention_normalized = (attention - source_mean) / source_std
+   ```
+
+3. **Schema extension.** Add `source` field to the post schema:
+   ```python
+   @dataclass
+   class Post:
+       id: int
+       title: str
+       score: int
+       num_comments: int
+       timestamp: datetime
+       url: str | None
+       attention: float
+       source: str           # "hn" or "reddit"
+       source_detail: str    # "hn" or subreddit name (e.g. "r/programming")
+   ```
+
+4. **Implementation.** New module `src/ingest_reddit.py` with the same `run(year) -> DataFrame` interface. The rest of the pipeline (embed, cluster, score, visualize) works unchanged — it just sees more rows.
+
+5. **Visualization enhancement.** Ridge plot could color-code by source agreement:
+   - Topics with both HN + Reddit signal → high confidence (bold)
+   - HN-only or Reddit-only → lower confidence (lighter)
+
+**Prerequisites:** Complete the HN pipeline end-to-end first (Phases A-D). Reddit integration is additive — it only touches ingest and config.
 
 ---
 
