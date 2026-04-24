@@ -1,0 +1,19 @@
+# Core
+datasets
+pandas
+pyarrow
+numpy
+
+# Embedding (via toolkit, but needed transitively)
+sentence-transformers
+
+# Clustering (via toolkit, but needed transitively)
+hdbscan
+umap-learn
+
+# Visualization
+matplotlib
+joypy
+
+# Utilities
+tqdm

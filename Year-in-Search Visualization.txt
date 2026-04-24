@@ -1,0 +1,336 @@
+# Year-in-Search Visualization — Prototype Design Doc
+
+## 1. Objective
+
+Create yearly visualizations (ridge plots) that show **what captured public attention over time**, using search behavior as the signal.
+
+Key distinction:
+
+* Not “most searched terms”
+* But **queries with abnormal attention in a given year**
+
+---
+
+## 2. Core Insight
+
+The problem splits into two fundamentally different layers:
+
+### A. Topic Discovery (hard part)
+
+* Identify which topics/events matter for a given year
+* Must be data-driven (or semi-data-driven)
+
+### B. Visualization (solved)
+
+* Given a list of keywords → fetch Google Trends → plot curves
+
+Existing repos (e.g. https://github.com/joweich/year-in-search-trends) solve only **B**.
+
+---
+
+## 3. Conceptual Model
+
+We are detecting:
+
+> **Year-specific anomalies in search attention**
+
+Instead of:
+
+* absolute volume
+* or editorial selection
+
+We want:
+
+* queries whose attention in year Y is elevated relative to baseline
+
+---
+
+## 4. Data Constraints
+
+We **do not have access to full search corpus**.
+
+Available signals (via Google Trends / pytrends):
+
+* Interest over time (normalized index)
+* Trending searches (daily / realtime)
+* Related queries / topics
+* Interest by region
+
+Implication:
+
+* Pipeline must be **candidate discovery → scoring**, not corpus mining
+
+---
+
+## 5. High-Level Pipeline
+
+### Step 1 — Candidate Discovery
+
+Build a pool of candidate queries using:
+
+* Daily trending searches (primary)
+* Optional:
+
+  * headlines (entity extraction)
+  * year-in-review lists
+
+Output:
+
+* Large set of candidate queries per year
+
+---
+
+### Step 2 — Time Series Collection
+
+For each candidate:
+
+* Pull interest over time
+* Use multi-year window (e.g., Y−2 … Y+2)
+
+---
+
+### Step 3 — Anomaly Scoring
+
+Define:
+
+```
+YearSpikeScore = mean(Y) / mean(baseline)
+```
+
+or:
+
+```
+z = (mean(Y) − baseline_mean) / baseline_std
+```
+
+Also compute:
+
+* peak value
+* area under curve
+* duration above threshold
+
+---
+
+### Step 4 — Classification
+
+Automatically separate:
+
+| Type      | Characteristics              |
+| --------- | ---------------------------- |
+| Spike     | high peak, short duration    |
+| Sustained | moderate peak, long duration |
+| Noise     | low lift                     |
+
+---
+
+### Step 5 — Topic Consolidation
+
+Cluster queries into topics:
+
+* merge variants (“X movie”, “X trailer”)
+* merge synonyms
+* optionally expand via related queries
+
+Output:
+
+* canonical topic
+* representative query (“anchor”)
+
+---
+
+### Step 6 — Selection
+
+For each year:
+
+* top N spike topics
+* optionally top M sustained topics
+* optional category balancing (politics / tech / culture)
+
+---
+
+### Step 7 — Visualization
+
+* Ridge plot (per-topic time series)
+* optional:
+
+  * separate encoding for sustained topics (bands)
+  * or separate panel
+
+---
+
+## 6. Handling “Sustained Salience”
+
+Problem:
+
+* sustained topics look flat under normalization
+
+Solutions:
+
+1. Treat as separate visual class (bands/ribbons)
+2. Rank by **area under curve**, not peak
+3. Separate panel (spikes vs persistent)
+4. Dual encoding (height vs thickness)
+
+Key insight:
+
+* sustained ≠ weak spike → it’s a different phenomenon
+
+---
+
+## 7. Topic → Query Mapping
+
+We cannot retrieve all queries for a topic.
+
+Approach:
+
+* Generate **query families**:
+
+  * entity-based
+  * event-based
+  * template expansions
+* Use:
+
+  * related queries (pytrends)
+* Select:
+
+  * one **anchor query** per topic (best signal)
+
+Optional:
+
+* score candidates by peak alignment / noise
+
+---
+
+## 8. Tools
+
+### Primary (prototype)
+
+* **pytrends**
+
+  * interest_over_time
+  * trending_searches
+  * related_queries / topics
+
+### Visualization
+
+* seaborn / matplotlib (ridge plots)
+
+### Optional
+
+* NLP for entity extraction (if using headlines)
+* clustering (simple string + heuristic clustering sufficient initially)
+
+---
+
+## 9. Known Limitations
+
+### Data limitations
+
+* normalized indices (no absolute volume)
+* max ~5 keywords per query
+* no full corpus access
+* sampling noise
+
+### pytrends issues
+
+* unofficial (can break)
+* rate limiting (429 errors)
+* inconsistent scaling across requests
+
+---
+
+## 10. Normalization Challenge
+
+Problem:
+
+* each query is scaled independently
+
+Workarounds:
+
+* anchor keyword method
+* overlapping batch stitching
+* accept relative (shape-only) comparison
+
+For ridge plots, shape matters more than absolute magnitude.
+
+---
+
+## 11. Approach Options (Design Space)
+
+### A. Editorial
+
+* manual selection
+* highest semantic quality
+* low scalability
+
+### B. Headline-driven
+
+* extract entities from news
+* semi-automated
+* still biased
+
+### C. Trends-first (data-native)
+
+* use trending queries directly
+* best alignment with signal
+* needs clustering
+
+### D. Hybrid (recommended)
+
+* trends-based discovery
+* editorial cleanup
+* category balancing
+
+---
+
+## 12. Recommended Prototype Approach
+
+1. Use **daily trending searches** to build candidate set
+2. Pull time series via pytrends
+3. Compute anomaly scores
+4. Select top topics
+5. Manually clean labels
+6. Plot
+
+This yields:
+
+* mostly automated pipeline
+* minimal manual work
+* high alignment with search behavior
+
+---
+
+## 13. Open Questions / Future Work
+
+### Data / Method
+
+* How to normalize across queries robustly?
+* How many years needed for stable baseline?
+* How to handle multi-language/global queries?
+* How to cluster queries into topics automatically?
+
+### Visualization
+
+* Should sustained topics be integrated or separated?
+* Should magnitude be encoded (color, thickness)?
+* How to maintain consistency across years?
+
+### Productization
+
+* move from pytrends → official API (if available)
+* caching / data storage
+* incremental updates
+
+---
+
+## 14. Key Takeaways
+
+* This is not a visualization problem — it is a **signal extraction problem**
+* The core difficulty is **candidate discovery + anomaly detection**
+* Google Trends already provides **precomputed signals** — leverage them
+* Full automation is possible but requires:
+
+  * query harvesting
+  * scoring
+  * clustering
+* Visualization is the easy final step
