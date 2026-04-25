@@ -1,5 +1,5 @@
 # Core
-datasets
+huggingface_hub
 pandas
 pyarrow
 numpy
@@ -14,6 +14,3 @@ umap-learn
 # Visualization
 matplotlib
 joypy
-
-# Utilities
-tqdm

@@ -6,16 +6,11 @@ Usage:
 """
 
 import argparse
-import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from . import config
-
-# Add toolkit to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "toolkit" / "src"))
 
 
 def cluster_embeddings(vectors: np.ndarray) -> np.ndarray:
