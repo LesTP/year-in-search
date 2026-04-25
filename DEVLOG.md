@@ -112,6 +112,64 @@ Code review of score.py. Findings applied:
 
 Phase validation: re-ran on 2024 data, verified schema (9 columns), 53-bin time series, all categories valid, no zero-attention or zero-post clusters. Classification unchanged from Step 1.
 
+## Phase 4: Curate
+
+### Step 1: Implement curate.py, run, and AI curation pass
+- **Mode:** Code
+- **Outcome:** complete
+- **Contract changes:** none
+
+Implemented `src/curate.py` — Phase 6 from DESIGN.md:
+- Loads scored topics, joins with posts+clusters for top 5 titles per cluster (pipe-joined)
+- Ranks by total_attention descending, takes top 50
+- Exports `data/curated/{year}_draft_topics.csv`
+- CLI: `python -m src.curate --year 2024`
+
+**Run results (2024 data):**
+- 50 topics exported to draft CSV
+- Category breakdown: 28 spike / 13 moderate / 9 sustained
+
+**AI curation pass:**
+- Selected 20 topics from 50, shortened labels, provided selection rationale
+- Saved as `data/curated/2024_ai_curated_topics.csv` with `ai_notes` column
+- User will do own pass on draft, then compare
+
+**Post-visualization refinements:**
+- Replaced "Notable Deaths" (catch-all "X has died" cluster) with top 2 individuals: Vernor Vinge (sci-fi author, singularity concept) and Daniel Kahneman (Nobel laureate, behavioral economics)
+- Removed "Open Source" (perennial community discussion, not a 2024-specific event)
+- Synthetic cluster entries created with per-person time series extracted from original cluster
+
+## Phase 5: Visualize
+
+### Step 1: Implement visualize.py and run on 2024 data
+- **Mode:** Code-Debug
+- **Outcome:** complete
+- **Contract changes:** output files are `{year}_year_in_tech_{variant}.png/svg`
+
+Implemented `src/visualize.py` — Phase 7 from DESIGN.md:
+- Ridge plot with peak-week color gradient (cool→warm via custom colormap)
+- Topics ordered chronologically by peak_week (bottom=Jan, top=Dec)
+- Per-curve normalization to [0,1] for uniform row height
+- White outline separates overlapping fills
+- Labels positioned left of each row
+- Month labels on x-axis at approximate ISO week positions
+- Gaussian smoothing via `scipy.ndimage.gaussian_filter1d` at configurable sigma
+- Supports curated subset filtering (--curated ai/final)
+- CLI: `python -m src.visualize --year 2024`
+
+**Smoothing comparison:**
+- Tested sigma values: 0.8 (light), 1.0 (medium rare), 1.2 (medium), 1.5, 2.5 (heavy)
+- User selected sigma=1.0 as best balance between spike clarity and visual smoothness
+- Row spacing tuned from overlap=0.65 → 0.35 → 0.15 for clear separation
+
+**Output files (2024, AI-curated 20 topics):**
+- `output/2024_year_in_tech_raw.png/svg` — unsmoothed
+- `output/2024_year_in_tech_smooth_light.png/svg` — sigma=0.8
+- `output/2024_year_in_tech_smooth_medium_rare.png/svg` — sigma=1.0 (preferred)
+- `output/2024_year_in_tech_smooth_medium.png/svg` — sigma=1.2
+
+**Dependencies added:** `matplotlib`, `scipy` (not in requirements.txt yet — CPU-only, standard packages)
+
 ## Phase 3: Label
 
 ### Step 1: Implement label.py and run on 2024 data

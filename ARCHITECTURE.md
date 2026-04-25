@@ -10,7 +10,8 @@
 | `cluster.py` | Group embeddings into topic clusters (HDBSCAN + UMAP) | `config`, `toolkit.clustering` |
 | `score.py` | Aggregate attention per cluster, compute time series, classify | `config` |
 | `label.py` | Auto-label clusters from top title, optional LLM cleanup | `config`, `toolkit.llm_client` (optional) |
-| `visualize.py` | Generate ridge plot from scored/labeled topics | `config`, `matplotlib` |
+| `curate.py` | Export ranked topic list as CSV for human review | `config` |
+| `visualize.py` | Generate ridge plot from scored/labeled topics | `config`, `matplotlib`, `scipy` |
 
 No cross-phase imports. Each phase reads the previous phase's output from disk.
 
@@ -61,8 +62,8 @@ Each phase is a standalone CLI: `python -m src.<phase> --year 2024`. No orchestr
 | 3 | Cluster | Requires embeddings; toolkit.clustering is stable | Complete |
 | 4 | Score & Classify | Requires cluster assignments + original posts | Complete |
 | 5 | Label | Requires scored clusters | Complete |
-| 6 | Curate | Manual step — depends on labeled output | In progress |
-| 7 | Visualize | Final output — depends on curated topics | Not started |
+| 6 | Curate | Manual step — depends on labeled output | Complete |
+| 7 | Visualize | Final output — depends on curated topics | Complete |
 
 ## Coupling Notes
 
@@ -95,7 +96,7 @@ Revisit if: Reddit multi-source extension adds enough complexity to warrant sepa
 ## Provisional Contracts
 
 - **Score input format** — Score phase will join `{year}_posts.parquet` with `{year}_clusters.parquet` on `id`. Schema is stable from Phase A. No provisional concerns.
-- **Label → Visualize contract** — Label produces a `label` column on the scored data. Visualize reads it. Exact format (string length, cleaning rules) will be defined when Phase 5 is built.
+- **Label → Visualize contract** — Label produces a `label` column on the scored data. Visualize reads it. Curated CSV filters the subset and can override labels. Visualize reads `time_series` JSON column from scored parquet.
 
 ---
 
@@ -105,3 +106,5 @@ Revisit if: Reddit multi-source extension adds enough complexity to warrant sepa
 | 2026-04-25 | Initial ARCHITECTURE.md | Created per governance framework from DESIGN.md and CLAUDE.md |
 | 2026-04-25 | Score & Classify complete | Updated implementation sequence — Phase 4 marked Complete |
 | 2026-04-25 | Label complete | Phase 5 marked Complete, added `label` to TopicScore |
+| 2026-04-25 | Curate complete | Phase 6 marked Complete, curate.py + AI curation pass done |
+| 2026-04-25 | Visualize complete | Phase 7 marked Complete, visualize.py with ridge plot + smoothing variants |

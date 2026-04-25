@@ -1,12 +1,12 @@
 ---
 module: PIPELINE
-phase: 4
-phase_title: "Curate"
-step: 1 of 4
-mode: Code-Debug
+phase: complete
+phase_title: "All phases complete"
+step: n/a
+mode: n/a
 blocked: null
-regime: Build
-review_done: false
+regime: n/a
+review_done: true
 ---
 
 # Year-in-Search — Development Plan
@@ -27,39 +27,22 @@ review_done: false
 
 ## Current Status
 
-- **Phase** — 4 (Curate) — step 1 in progress
-- **Focus** — Implement curate.py, export draft CSV, then AI curation pass
+- **Phase** — All 7 phases complete (pipeline runs end-to-end)
+- **Focus** — Human curation pass still pending (user will review draft vs AI curation)
 - **Blocked/Broken** — Nothing
 
-## Phase 4: Curate
+## Pending Work (Post-Pipeline)
 
-**Inputs:**
-- `data/scored/{year}_topics.parquet` — labeled topics with metrics
-- `data/raw/{year}_posts.parquet` + `data/clusters/{year}_clusters.parquet` — for top titles
-
-**Outputs:**
-- `data/curated/{year}_draft_topics.csv` — top 50 ranked topics for human review
-- `data/curated/{year}_ai_curated_topics.csv` — AI curation pass (suggested merges, shortened labels, 15–25 selection)
-- `data/curated/{year}_final_topics.csv` — human-edited final selection (manual)
-
-### Step 1: Implement curate.py
-- Load scored topics, join with posts+clusters for top 5 titles per cluster
-- Rank by total_attention descending, take top 50
-- Export CSV: rank, cluster_id, label, total_attention, peak_attention, peak_week, num_posts, duration_weeks, category, top_titles (pipe-joined)
-- CLI: `python -m src.curate --year 2024`
-
-### Step 2: Run on 2024 data
-- Execute curate phase, inspect CSV output
-
-### Step 3: AI curation pass
-- Read draft CSV, propose: shortened labels, merge suggestions, select 15–25 topics
-- Save as `{year}_ai_curated_topics.csv`
-- Human does own pass on draft, then compares
-
-### Step 4: Review
-- Code review of curate.py
+1. **Human curation pass** — User reviews `data/curated/2024_draft_topics.csv`, creates `2024_final_topics.csv`, compares with AI curation
+2. **LLM labeling** — Optional refinement phase (D-6); user-triggered when ready
+3. **Multi-year mode** — Run pipeline for additional years, cross-year anomaly scoring
+4. **requirements.txt update** — Add `matplotlib` and `scipy`
 
 <!-- HISTORY — Worker: stop reading here. Everything below is completed phase history. -->
+
+## Phase 5: Visualize — Complete (see DEVLOG 2026-04-25)
+
+## Phase 4: Curate — Complete (see DEVLOG 2026-04-25)
 
 ## Phase 3: Label — Complete (see DEVLOG 2026-04-25)
 

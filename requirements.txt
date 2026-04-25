@@ -13,4 +13,4 @@ umap-learn
 
 # Visualization
 matplotlib
-joypy
+scipy
