@@ -2,8 +2,8 @@
 module: PIPELINE
 phase: 3
 phase_title: "Label"
-step: 0 of 0
-mode: Discuss
+step: 1 of 2
+mode: Code-Debug
 blocked: null
 regime: Build
 review_done: false
@@ -26,13 +26,31 @@ review_done: false
 
 ## Current Status
 
-- **Phase** — 3 (Label) — not started
-- **Focus** — Next up: implement Phase 5 per DESIGN.md Section 5
+- **Phase** — 3 (Label) — step 1 ready
+- **Focus** — Implement auto-label in `label.py`, run on 2024 data
 - **Blocked/Broken** — Nothing
 
 ## Phase 3: Label
 
-<!-- Break into steps during the Phase Plan action. See DESIGN.md Section 5, Phase 5. -->
+**Inputs:**
+- `data/scored/{year}_topics.parquet` — cluster metrics (3,356 rows)
+- `data/raw/{year}_posts.parquet` + `data/clusters/{year}_clusters.parquet` — member post titles
+
+**Output:**
+- `data/scored/{year}_topics.parquet` — updated in place with `label` column
+
+**Scope:** Auto-label only. LLM labeling is a planned future refinement, user-triggered (D-6).
+
+### Step 1: Implement label.py with auto-label logic
+- Join posts + clusters to get titles per cluster
+- For each cluster, pick title of highest-attention post
+- Clean: strip "Show HN:", "Ask HN:", "Tell HN:", "Launch HN:", leading punctuation/whitespace
+- Add `label` column to scored topics, save in place
+- CLI: `python -m src.label --year 2024`
+- Test: run on 2024, inspect top 20 labels for readability
+
+### Step 2: Review
+- Code review of label.py
 
 <!-- HISTORY — Worker: stop reading here. Everything below is completed phase history. -->
 

@@ -34,3 +34,10 @@ Priority: Important
 Decision: Use 53 bins (ISO weeks 1–53) instead of 52. Years without week 53 get a trailing 0.0. No folding into week 52.
 Rationale: ISO 8601 allows week 53 in some years. Dropping it loses data silently. Folding into week 52 creates an unequal bin (8–10 days). Since attention is summed (not averaged), a short week 53 naturally has low signal — no skew concern. Week 1/52 length variation is already accepted.
 Revisit if: Per-day normalization is needed for cross-year comparison.
+
+D-6: Auto-label first, LLM labeling deferred
+Date: 2026-04-25 | Status: Closed
+Priority: Important
+Decision: Phase 3 (Label) implements auto-labeling only — highest-attention post title per cluster, cleaned of HN prefixes. LLM-assisted labeling is a planned future refinement, triggered by user when ready.
+Rationale: Auto-label is deterministic, fast, and dependency-free. LLM labeling produces better ridge-plot labels but adds API cost, non-determinism, and `toolkit.llm_client` dependency. The Curate phase handles manual relabeling regardless. Better to see auto-label quality first, then decide if LLM cleanup is worth the complexity.
+Revisit if: Auto-labels prove too noisy for manual curation, or LLM access becomes trivial.
