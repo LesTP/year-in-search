@@ -240,16 +240,34 @@ Topics with high `year_spike_score` are year-specific. Topics with similar atten
 - For each cluster, select the title of the **highest-scored post** as the label
 - Clean it: strip "Show HN:", "Ask HN:", leading punctuation, etc.
 
-#### LLM-assisted labeling (optional)
-- For each cluster, send the top 10 titles to an LLM:
-  ```
-  These are Hacker News titles about the same topic:
-  1. {title_1}
-  2. {title_2}
-  ...
-  Generate a short, clean topic label (2-5 words).
-  ```
-- Use any available LLM (local or API)
+#### LLM-assisted labeling (optional, user-triggered refinement)
+
+Per D-6, this is deferred until the user decides auto-labels are insufficient. When triggered:
+
+**What it does:**
+For each cluster in the curated set (~20–50 topics), send the top 10 titles to an LLM and ask for a short, clean label:
+
+```
+These are Hacker News titles about the same topic:
+1. {title_1}
+2. {title_2}
+...
+Generate a short, clean topic label (2-5 words). Be specific — prefer
+"CrowdStrike Outage" over "Security Incident", "xz Backdoor" over "Supply Chain Attack".
+```
+
+**Implementation plan:**
+1. Add `--llm` flag to `src/label.py` that runs LLM labeling on the curated subset only (not all 3,400 clusters — too expensive and unnecessary)
+2. Use `toolkit.llm_client` for provider-agnostic LLM access
+3. Save LLM labels alongside auto-labels (new column `llm_label`) — don't overwrite
+4. Human reviews both columns in the curated CSV and picks the better label per topic
+5. The `label` column in the final curated CSV is the one used by `visualize.py`
+
+**Scope:** Only curated topics (~20–50 LLM calls). Not a batch job over all clusters.
+
+**Dependencies:** `toolkit.llm_client` must be implemented and configured with an API key.
+
+**When to trigger:** When auto-labels in the curated CSV feel too long, too HN-specific, or too ambiguous for the ridge plot. The 2024 AI curation pass already shortened labels manually — LLM labeling would automate that step.
 
 ---
 

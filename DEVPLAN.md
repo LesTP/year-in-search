@@ -34,8 +34,8 @@ review_done: true
 ## Pending Work (Post-Pipeline)
 
 1. **Human curation pass** — User reviews `data/curated/2024_draft_topics.csv`, creates `2024_final_topics.csv`, compares with AI curation
-2. **LLM labeling** — Optional refinement phase (D-6); user-triggered when ready
-3. **Multi-year mode** — Run pipeline for additional years, cross-year anomaly scoring
+2. **LLM labeling** — Optional refinement (D-6). Trigger when auto-labels feel too long or ambiguous for the ridge plot. See DESIGN.md "LLM-assisted labeling" section for the full workflow: add `--llm` flag to `label.py`, use `toolkit.llm_client`, save as `llm_label` column alongside `label`. Scope: curated subset only (~20–50 LLM calls). Requires `toolkit.llm_client` to be implemented.
+3. **Multi-year mode** — Run pipeline for additional years, compute cross-year baselines to filter perennial topics (Python, React, etc.), generate comparison ridge plots
 4. **requirements.txt update** — Add `matplotlib` and `scipy`
 
 <!-- HISTORY — Worker: stop reading here. Everything below is completed phase history. -->
