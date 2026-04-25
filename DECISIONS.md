@@ -24,8 +24,8 @@ Revisit if: Reddit multi-source extension or interactive visualization adds enou
 D-4: Time series stored as JSON string column
 Date: 2026-04-25 | Status: Closed
 Priority: Important
-Decision: Store each cluster's 52-point weekly attention time series as a JSON-encoded string column in the scored parquet file, rather than a separate numpy file or 52 flat columns.
-Rationale: Only ~3K clusters × 52 floats — tiny data. JSON keeps everything in one file, is human-readable, and trivially deserializable with `json.loads()`. Avoids parquet nested type complexity and extra file management. Downstream phases (label, visualize) can parse inline.
+Decision: Store each cluster's 53-point weekly attention time series as a JSON-encoded string column in the scored parquet file, rather than a separate numpy file or 53 flat columns.
+Rationale: Only ~3K clusters x 53 floats — tiny data. JSON keeps everything in one file, is human-readable, and trivially deserializable with `json.loads()`. Avoids parquet nested type complexity and extra file management. Downstream phases (label, visualize) can parse inline.
 Revisit if: Cluster count or time granularity grows enough to make JSON serialization a bottleneck (unlikely for this PoC).
 
 D-5: 53-bin weekly time series (ISO week 53 support)
