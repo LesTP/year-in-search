@@ -2,7 +2,7 @@
 
 A pipeline that discovers what topics captured outsized attention on Hacker News in a given year and visualizes their attention curves as a ridge plot.
 
-![Year in Tech 2024](output/2024_year_in_tech_smooth_medium_rare.png)
+![Year in Tech 2024](output/2024_year_in_tech_smooth.png)
 
 ## How it works
 

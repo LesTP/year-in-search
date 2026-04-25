@@ -1,6 +1,8 @@
 # Pipeline data (regenerable)
 data/
-output/
+
+# Output (keep PNGs for README, ignore SVGs)
+output/*.svg
 
 # Python
 __pycache__/
