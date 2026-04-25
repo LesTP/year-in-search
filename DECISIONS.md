@@ -20,3 +20,17 @@ Priority: Nice-to-have
 Decision: Single-module project — all phases live in one `src/` package. No per-module ARCH files.
 Rationale: Seven phases but one linear pipeline. No internal module boundaries, no cross-module integration concerns. Each phase reads files from disk — no in-memory coupling.
 Revisit if: Reddit multi-source extension or interactive visualization adds enough complexity to warrant separate modules.
+
+D-4: Time series stored as JSON string column
+Date: 2026-04-25 | Status: Closed
+Priority: Important
+Decision: Store each cluster's 52-point weekly attention time series as a JSON-encoded string column in the scored parquet file, rather than a separate numpy file or 52 flat columns.
+Rationale: Only ~3K clusters × 52 floats — tiny data. JSON keeps everything in one file, is human-readable, and trivially deserializable with `json.loads()`. Avoids parquet nested type complexity and extra file management. Downstream phases (label, visualize) can parse inline.
+Revisit if: Cluster count or time granularity grows enough to make JSON serialization a bottleneck (unlikely for this PoC).
+
+D-5: 53-bin weekly time series (ISO week 53 support)
+Date: 2026-04-25 | Status: Closed
+Priority: Important
+Decision: Use 53 bins (ISO weeks 1–53) instead of 52. Years without week 53 get a trailing 0.0. No folding into week 52.
+Rationale: ISO 8601 allows week 53 in some years. Dropping it loses data silently. Folding into week 52 creates an unequal bin (8–10 days). Since attention is summed (not averaged), a short week 53 naturally has low signal — no skew concern. Week 1/52 length variation is already accepted.
+Revisit if: Per-day normalization is needed for cross-year comparison.

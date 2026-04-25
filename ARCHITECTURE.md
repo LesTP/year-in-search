@@ -59,7 +59,7 @@ Each phase is a standalone CLI: `python -m src.<phase> --year 2024`. No orchestr
 | 1 | Ingest | Foundation — all downstream phases depend on ingested data | Complete |
 | 2 | Embed | Requires ingest output; toolkit.embedding is stable | Complete |
 | 3 | Cluster | Requires embeddings; toolkit.clustering is stable | Complete |
-| 4 | Score & Classify | Requires cluster assignments + original posts | Not started |
+| 4 | Score & Classify | Requires cluster assignments + original posts | Complete |
 | 5 | Label | Requires scored clusters | Not started |
 | 6 | Curate | Manual step — depends on labeled output | Not started |
 | 7 | Visualize | Final output — depends on curated topics | Not started |
@@ -103,3 +103,4 @@ Revisit if: Reddit multi-source extension adds enough complexity to warrant sepa
 | Date | What Changed | Why |
 |------|-------------|-----|
 | 2026-04-25 | Initial ARCHITECTURE.md | Created per governance framework from DESIGN.md and CLAUDE.md |
+| 2026-04-25 | Score & Classify complete | Updated implementation sequence — Phase 4 marked Complete |

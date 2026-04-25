@@ -192,7 +192,7 @@ For each cluster, compute:
 #### 4a. Time Series
 - Bin posts by **week** (ISO week number)
 - Per week: sum of `attention` scores for all posts in the cluster
-- Result: 52-point attention curve per cluster
+- Result: 53-point attention curve per cluster (ISO weeks 1–53; years without week 53 get a trailing 0)
 
 #### 4b. Metrics
 
@@ -387,7 +387,6 @@ SUSTAINED_MIN_DURATION = 8      # weeks
 
 # Visualization
 TOP_N_TOPICS = 20               # Default number of topics to visualize
-WEEKLY_BIN = True               # True = weekly, False = daily
 ```
 
 ---

@@ -1,7 +1,7 @@
 ---
 module: PIPELINE
-phase: 2
-phase_title: "Score & Classify"
+phase: 3
+phase_title: "Label"
 step: 0 of 0
 mode: Discuss
 blocked: null
@@ -22,17 +22,20 @@ review_done: false
   - Embedding cache lives in `data/embeddings/cache/` — first run downloads the model (~80MB)
   - HDBSCAN produces ~38% noise items — this is expected, not a bug
   - Run each phase from project root: `python -m src.<phase> --year 2024`
+  - ISO 8601 has week 53 in some years — time series uses 53 bins; downstream phases must handle length-53 arrays (D-5)
 
 ## Current Status
 
-- **Phase** — 2 (Score & Classify) — not started
-- **Focus** — Next up: implement Phase 4 per DESIGN.md Section 5
+- **Phase** — 3 (Label) — not started
+- **Focus** — Next up: implement Phase 5 per DESIGN.md Section 5
 - **Blocked/Broken** — Nothing
 
-## Phase 2: Score & Classify
+## Phase 3: Label
 
-<!-- Break into steps during the Phase Plan action. See DESIGN.md Section 5, Phase 4. -->
+<!-- Break into steps during the Phase Plan action. See DESIGN.md Section 5, Phase 5. -->
 
 <!-- HISTORY — Worker: stop reading here. Everything below is completed phase history. -->
+
+## Phase 2: Score & Classify — Complete (see DEVLOG 2026-04-25)
 
 ## Phase 1: Pipeline Skeleton (Ingest, Embed, Cluster) — Complete (see DEVLOG 2026-04-25)
