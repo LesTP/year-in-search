@@ -1,9 +1,9 @@
 ---
 module: PIPELINE
-phase: 3
-phase_title: "Label"
-step: 1 of 2
-mode: Code-Debug
+phase: 4
+phase_title: "Curate"
+step: 0 of 0
+mode: Discuss
 blocked: null
 regime: Build
 review_done: false
@@ -23,36 +23,21 @@ review_done: false
   - HDBSCAN produces ~38% noise items — this is expected, not a bug
   - Run each phase from project root: `python -m src.<phase> --year 2024`
   - ISO 8601 has week 53 in some years — time series uses 53 bins; downstream phases must handle length-53 arrays (D-5)
+  - HN dataset has ~132 posts with empty titles — filter `title.str.strip() != ""` before any title-based operations
 
 ## Current Status
 
-- **Phase** — 3 (Label) — step 1 ready
-- **Focus** — Implement auto-label in `label.py`, run on 2024 data
+- **Phase** — 4 (Curate) — not started
+- **Focus** — Next up: implement Phase 6 per DESIGN.md Section 5
 - **Blocked/Broken** — Nothing
 
-## Phase 3: Label
+## Phase 4: Curate
 
-**Inputs:**
-- `data/scored/{year}_topics.parquet` — cluster metrics (3,356 rows)
-- `data/raw/{year}_posts.parquet` + `data/clusters/{year}_clusters.parquet` — member post titles
-
-**Output:**
-- `data/scored/{year}_topics.parquet` — updated in place with `label` column
-
-**Scope:** Auto-label only. LLM labeling is a planned future refinement, user-triggered (D-6).
-
-### Step 1: Implement label.py with auto-label logic
-- Join posts + clusters to get titles per cluster
-- For each cluster, pick title of highest-attention post
-- Clean: strip "Show HN:", "Ask HN:", "Tell HN:", "Launch HN:", leading punctuation/whitespace
-- Add `label` column to scored topics, save in place
-- CLI: `python -m src.label --year 2024`
-- Test: run on 2024, inspect top 20 labels for readability
-
-### Step 2: Review
-- Code review of label.py
+<!-- Break into steps during the Phase Plan action. See DESIGN.md Section 5, Phase 6. -->
 
 <!-- HISTORY — Worker: stop reading here. Everything below is completed phase history. -->
+
+## Phase 3: Label — Complete (see DEVLOG 2026-04-25)
 
 ## Phase 2: Score & Classify — Complete (see DEVLOG 2026-04-25)
 

@@ -111,3 +111,32 @@ Code review of score.py. Findings applied:
 - **Spike ratio rounding:** Noted as optional — kept `round(spike_ratio, 2)` for now, acceptable for PoC.
 
 Phase validation: re-ran on 2024 data, verified schema (9 columns), 53-bin time series, all categories valid, no zero-attention or zero-post clusters. Classification unchanged from Step 1.
+
+## Phase 3: Label
+
+### Step 1: Implement label.py and run on 2024 data
+- **Mode:** Code-Debug
+- **Outcome:** complete
+- **Contract changes:** added `label` column to `{year}_topics.parquet`
+
+Implemented `src/label.py` — Phase 5 from DESIGN.md:
+- Auto-label only (D-6) — picks highest-attention post title per cluster
+- Cleans HN prefixes: strips "Show HN:", "Ask HN:", "Tell HN:", "Launch HN:" and leading punctuation
+- Filters out empty-title posts before picking best title (data quality: 132 clusters have all-empty titles in source data)
+- Merges `label` column into scored topics, saves in place
+- Idempotent — drops existing `label` column before re-merging
+- CLI: `python -m src.label --year 2024`
+
+**Run results (2024 data):**
+- 3,224 / 3,356 topics labeled (132 unlabeled = all-empty-title clusters from HN source data)
+- Labels are full HN titles — readable but long (LLM labeling deferred per D-6)
+- Top labels match known 2024 events: CrowdStrike, xz backdoor, ChatGPT, Rust, LLMs, GPT-4o, Meta Llama 3, TikTok bill
+
+**Investigation:** 134 initially unlabeled clusters traced to empty-title posts in HN dataset. 132 had zero titled posts. 2 had titled posts but the highest-attention post was untitled — fixed by filtering empty titles before `idxmax()`.
+
+### Step 2: Review
+- **Mode:** Review
+- **Outcome:** complete (nothing to fix)
+- **Contract changes:** none
+
+Code review found no issues. 82 lines, no dead code, no unused imports, no architecture drift. Clean pass.

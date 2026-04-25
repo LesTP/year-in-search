@@ -21,7 +21,7 @@ No cross-phase imports. Each phase reads the previous phase's output from disk.
 - **HNPost** — `{id: int, title: str, score: int, num_comments: int, timestamp: datetime, url: str?, attention: float}`
 - **Embedding** — `ndarray (n_posts, 384)` with parallel `ndarray (n_posts,)` ID mapping
 - **ClusterAssignment** — `{id: int, cluster_id: int}` where -1 = noise
-- **TopicScore** — `{cluster_id: int, total_attention: float, peak_attention: float, peak_week: int, num_posts: int, duration_weeks: int, spike_ratio: float, category: str, label: str, time_series: list[float]}`
+- **TopicScore** — `{cluster_id: int, total_attention: float, peak_attention: float, peak_week: int, num_posts: int, duration_weeks: int, spike_ratio: float, category: str, label: str, time_series: list[float]}` (label added by Phase 5)
 
 ### Flow
 
@@ -60,7 +60,7 @@ Each phase is a standalone CLI: `python -m src.<phase> --year 2024`. No orchestr
 | 2 | Embed | Requires ingest output; toolkit.embedding is stable | Complete |
 | 3 | Cluster | Requires embeddings; toolkit.clustering is stable | Complete |
 | 4 | Score & Classify | Requires cluster assignments + original posts | Complete |
-| 5 | Label | Requires scored clusters | In progress |
+| 5 | Label | Requires scored clusters | Complete |
 | 6 | Curate | Manual step — depends on labeled output | Not started |
 | 7 | Visualize | Final output — depends on curated topics | Not started |
 
@@ -104,3 +104,4 @@ Revisit if: Reddit multi-source extension adds enough complexity to warrant sepa
 |------|-------------|-----|
 | 2026-04-25 | Initial ARCHITECTURE.md | Created per governance framework from DESIGN.md and CLAUDE.md |
 | 2026-04-25 | Score & Classify complete | Updated implementation sequence — Phase 4 marked Complete |
+| 2026-04-25 | Label complete | Phase 5 marked Complete, added `label` to TopicScore |
