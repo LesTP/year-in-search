@@ -513,6 +513,29 @@ python -m src.visualize --year 2024
 
 **Prerequisites:** Complete the HN pipeline end-to-end first (Phases A-D). Reddit integration is additive — it only touches ingest and config.
 
+#### 11a-i. Standalone Reddit Run + HN Comparison
+
+Before merging sources (the full §11a plan), run the pipeline independently on Reddit data and compare with HN results. This answers: **how much does the community you listen to shape the "year in tech" narrative?**
+
+**Approach:**
+1. **Ingest Reddit data** — `src/ingest_reddit.py` targeting `r/programming` and `r/technology` (largest general tech subreddits). Use `attention = score + 0.5 * num_comments` with per-source normalization to bring Reddit scores into the same range as HN.
+2. **Run the full pipeline independently** — embed, cluster, score, label, curate, visualize. Produces a separate "Year in Tech (Reddit)" ridge plot.
+3. **Compare** — match HN and Reddit topics by label similarity (embedding cosine distance between cluster labels) or manual alignment. For each topic, compare:
+   - Present on both / HN-only / Reddit-only
+   - Peak week alignment (same event, same timing?)
+   - Attention magnitude ratio (which community cared more?)
+   - Curve shape (spike on HN but sustained on Reddit, or vice versa?)
+
+**Expected findings:**
+- High overlap on major events (CrowdStrike, xz backdoor) — these are industry-wide
+- HN skews toward startups, YC companies, Show HN launches
+- Reddit skews toward broader developer experience, tooling debates, career discussion
+- Some topics may cluster differently — Reddit's `r/programming` mixes languages/frameworks more than HN
+
+**Output:** Side-by-side ridge plots (HN vs Reddit) for the same year, plus a comparison table showing topic overlap and divergence. This validates (or challenges) whether HN alone is a sufficient signal for "Year in Tech."
+
+**Data volume estimate:** `r/programming` has ~100K posts/year, `r/technology` ~200K. Combined with HN's ~87K, this roughly triples the embedding workload (~15 min on CPU).
+
 ### 11b. Alternate Domain: Job Postings ("Year in Hiring")
 
 **Goal:** Apply the same pipeline to job posting data to discover hiring trends — what roles surged, which sectors had hiring spikes, how demand shifted across the year. The output is a "Year in Hiring" ridge plot showing the biggest job market stories.

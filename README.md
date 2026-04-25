@@ -2,8 +2,6 @@
 
 A pipeline that discovers what topics captured outsized attention on Hacker News in a given year and visualizes their attention curves as a ridge plot.
 
-![Year in Tech 2024](output/2024_year_in_tech_smooth.png)
-
 ## How it works
 
 The pipeline takes a year of Hacker News data and asks: *what were the big stories in tech this year?* It answers by treating HN's collective upvoting and commenting as an editorial signal — the community already surfaces what it finds noteworthy. Our job is to aggregate that signal into coherent topics, measure their intensity over time, and visualize the result.
@@ -53,7 +51,9 @@ The final output is a ridge plot where each row is a topic's weekly attention cu
 
 ## 2024 results
 
-The 2024 ridge plot (shown above) captures 20 topics spanning the year:
+![Year in Tech 2024](output/2024_year_in_tech_smooth.png)
+
+The 2024 ridge plot captures 20 topics spanning the year:
 
 - **January**: Boeing 737 MAX door plug blowout, Apple forced to comply with EU DMA
 - **March**: Vernor Vinge and Daniel Kahneman deaths, xz backdoor supply chain attack
@@ -78,6 +78,7 @@ The embedding, clustering, scoring, and visualization phases work unchanged on a
 - **Multi-year mode** — run the pipeline across multiple years, compute cross-year baselines to filter out perennial topics (Python, React, etc.), and generate comparison ridge plots.
 - **LLM labeling** — use an LLM to generate short, clean topic labels from each cluster's top titles instead of using raw HN titles.
 - **Multi-source** — add Reddit tech subreddits as a second attention signal, with per-source normalization.
+- **Reddit comparison** — run the pipeline independently on `r/programming` + `r/technology` and compare with HN results: which topics overlap, which are community-specific, how do attention curves differ? See DESIGN.md §11a-i.
 - **Job postings ("Year in Hiring")** — apply the same pipeline to job data using posting count as the attention signal. Facet by seniority and geography for sliceable ridge plots. See DESIGN.md §11b.
 
 ## Setup and usage
