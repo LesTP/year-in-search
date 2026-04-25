@@ -188,16 +188,14 @@ def run(year: int, curated: str | None = "ai") -> None:
     plt.close(fig_raw)
     print(f"  Saved raw: {raw_png}")
 
-    # Smoothed versions at different sigma levels
-    for sigma, label in [(0.8, "light"), (1.0, "medium_rare"), (1.2, "medium")]:
-        fig = render_ridge(topics, year, smooth=True, sigma=sigma)
-        tag = f"smooth_{label}"
-        png = config.OUTPUT_DIR / f"{year}_year_in_tech_{tag}.png"
-        svg = config.OUTPUT_DIR / f"{year}_year_in_tech_{tag}.svg"
-        fig.savefig(png, dpi=200, bbox_inches="tight")
-        fig.savefig(svg, bbox_inches="tight")
-        plt.close(fig)
-        print(f"  Saved {tag} (sigma={sigma}): {png}")
+    # Smoothed version (sigma=1.0)
+    fig = render_ridge(topics, year, smooth=True, sigma=1.0)
+    smooth_png = config.OUTPUT_DIR / f"{year}_year_in_tech_smooth.png"
+    smooth_svg = config.OUTPUT_DIR / f"{year}_year_in_tech_smooth.svg"
+    fig.savefig(smooth_png, dpi=200, bbox_inches="tight")
+    fig.savefig(smooth_svg, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved smooth: {smooth_png}")
 
 
 if __name__ == "__main__":
@@ -205,7 +203,5 @@ if __name__ == "__main__":
     parser.add_argument("--year", type=int, default=2024)
     parser.add_argument("--curated", type=str, default="ai",
                         help="Curated list to use: 'ai', 'final', or omit for all scored topics")
-    parser.add_argument("--smooth-only", action="store_true",
-                        help="Only produce smoothed version")
     args = parser.parse_args()
     run(args.year, curated=args.curated if args.curated else None)
