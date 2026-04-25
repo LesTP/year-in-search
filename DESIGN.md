@@ -513,6 +513,49 @@ python -m src.visualize --year 2024
 
 **Prerequisites:** Complete the HN pipeline end-to-end first (Phases A-D). Reddit integration is additive — it only touches ingest and config.
 
+### 11b. Alternate Domain: Job Postings ("Year in Hiring")
+
+**Goal:** Apply the same pipeline to job posting data to discover hiring trends — what roles surged, which sectors had hiring spikes, how demand shifted across the year. The output is a "Year in Hiring" ridge plot showing the biggest job market stories.
+
+**Attention signal:** Job postings have no engagement metric (no upvotes, no comments). Use **simple count** as the attention signal: `attention = 1` per posting. The time series becomes "how many postings in this cluster per week," which is directly meaningful — a spike in "AI Engineer" postings tells you something real about hiring demand.
+
+**Salary as a secondary signal:** Many postings omit salary data. Before using salary-weighted attention (`attention = midpoint_salary`), run a data quality check: what % of postings include salary? If coverage is high enough (>60%), salary weighting produces a richer signal (captures both volume *and* compensation trends). If too sparse, stick with count-based.
+
+**Pipeline changes:**
+
+| Phase | Change needed |
+|-------|--------------|
+| `ingest.py` | New loader for job data source. Set `attention = 1`. Parse title, location, seniority if available. |
+| `config.py` | Adjust `SPIKE_RATIO_THRESHOLD` — count-based distributions are less spiky than HN attention. `SUSTAINED_MIN_DURATION` may need to decrease since job demand is naturally more sustained. |
+| `embed.py` | Unchanged — job titles embed the same way. |
+| `cluster.py` | Unchanged. May need `MIN_CLUSTER_SIZE` tuning for different data volumes. |
+| `score.py` | Unchanged — sums `attention` per week per cluster regardless of what attention means. |
+| `label.py` | Adjust prefix stripping for job title conventions instead of HN prefixes. |
+| `curate.py` | Unchanged. |
+| `visualize.py` | Unchanged, but consider axis labels ("postings" not "attention"). |
+
+**Classification mapping:**
+- **Spike** = sudden hiring surge (new product launch, funding round, regulatory compliance deadline)
+- **Sustained** = evergreen demand (SWE, data science, devops)
+- **Moderate** = seasonal or steady-state hiring
+
+**Faceting by seniority and geography:**
+
+Job data naturally supports dimensions that HN data doesn't: seniority level and location. Two approaches:
+
+1. **Faceted ridge plots** — generate separate ridge plots per slice (e.g., "Year in Hiring: Senior+ Roles" / "Year in Hiring: Bay Area"). Simple, uses existing pipeline by filtering in ingest. Produces multiple static images.
+
+2. **Interactive sliceable chart** — Plotly/D3.js version with dropdowns for seniority and geography. More useful for exploration but requires a webapp layer. Good candidate for a Streamlit app.
+
+Start with faceted static plots (approach 1) since the pipeline already supports it — just filter the DataFrame in ingest. Interactive can come later.
+
+**Key differences from HN analysis:**
+- **No perennial problem** — unlike HN where "Python" is always discussed, job postings for "Python Developer" reflect genuine hiring demand. Perennials are *interesting*, not noise.
+- **Geography matters** — remote vs. on-site, regional hiring patterns, cross-border trends.
+- **Seniority signal** — entry-level surges vs. senior hiring tell different stories about market health.
+
+**Data source options:** LinkedIn data exports, Indeed/Glassdoor datasets on HuggingFace, government labor statistics (BLS/JOLTS), or company-specific ATS exports.
+
 ---
 
 ## 12. Success Criteria

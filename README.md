@@ -78,6 +78,7 @@ The embedding, clustering, scoring, and visualization phases work unchanged on a
 - **Multi-year mode** — run the pipeline across multiple years, compute cross-year baselines to filter out perennial topics (Python, React, etc.), and generate comparison ridge plots.
 - **LLM labeling** — use an LLM to generate short, clean topic labels from each cluster's top titles instead of using raw HN titles.
 - **Multi-source** — add Reddit tech subreddits as a second attention signal, with per-source normalization.
+- **Job postings ("Year in Hiring")** — apply the same pipeline to job data using posting count as the attention signal. Facet by seniority and geography for sliceable ridge plots. See DESIGN.md §11b.
 
 ## Setup and usage
 
