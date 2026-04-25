@@ -61,7 +61,7 @@ Each phase is a standalone CLI: `python -m src.<phase> --year 2024`. No orchestr
 | 3 | Cluster | Requires embeddings; toolkit.clustering is stable | Complete |
 | 4 | Score & Classify | Requires cluster assignments + original posts | Complete |
 | 5 | Label | Requires scored clusters | Complete |
-| 6 | Curate | Manual step — depends on labeled output | Not started |
+| 6 | Curate | Manual step — depends on labeled output | In progress |
 | 7 | Visualize | Final output — depends on curated topics | Not started |
 
 ## Coupling Notes
