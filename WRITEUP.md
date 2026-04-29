@@ -6,9 +6,9 @@
 
 ## 1. Introduction
 
-The starting point for this project was a ridge plot chart — the kind produced by Google's "Year in Search" — saved on a phone since 2022. Those charts are compelling: each row is a topic, each curve shows when and how intensely the public paid attention, and together they tell the story of a year. The idea was simple: recreate this for the tech world, using data rather than editorial curation to decide what topics earned a slot.
+The starting point for this project was a ridge plot chart produced by [joweich](https://github.com/joweich/year-in-search-trends) and based on data from Google's "Year in Search," a screenshot of which I had on my phone since 2022. The charts are compelling: each row is a topic, each curve shows when and how intensely the public paid attention, and together they tell the story of a year. I wanted to recreate this for a recent year, using data rather than editorial curation to decide what topics earned a slot.
 
-Google's original charts are editorially curated — someone picks the keywords, pulls Trends data, and plots the curves. The visualization half is straightforward. The hard half is *topic discovery*: figuring out what to plot in the first place. This project tackles both, building a seven-stage pipeline that starts from raw community data and ends with a finished ridge plot — with minimal manual intervention.
+Joweich's original charts are editorially curated — one picks the keywords, pulls Trends data, and plots the curves. The visualization half is straightforward. The hard half is *topic discovery*: figuring out what to plot in the first place. This project tackles both, building a seven-stage pipeline that starts from raw community data and ends with a finished ridge plot — with minimal manual intervention.
 
 The result for 2024 captures 20 topics spanning the year: the Boeing 737 MAX crisis in January, the xz supply chain backdoor in March, the CrowdStrike outage in July, and sustained year-round discussion of LLMs, Rust, and PostgreSQL, among others.
 

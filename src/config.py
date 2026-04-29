@@ -33,7 +33,7 @@ STORY_TYPE = 1                  # HN type code: 1 = story
 # Attention scoring
 # ---------------------------------------------------------------------------
 
-COMMENT_WEIGHT = 0.5            # α in: attention = score + α * num_comments
+COMMENT_WEIGHT = 2.0            # α in: attention = score + α * num_comments
 
 # ---------------------------------------------------------------------------
 # Embedding
