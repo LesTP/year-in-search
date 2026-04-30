@@ -51,7 +51,7 @@ The final output is a ridge plot where each row is a topic's weekly attention cu
 
 ## 2024 results
 
-![Year in Tech 2024](output/2024_year_in_tech_smooth.png)
+![Year in Tech 2024](output/2024_year_in_tech_smooth_2x_likes.png)
 
 The 2024 ridge plot captures 20 topics spanning the year:
 
