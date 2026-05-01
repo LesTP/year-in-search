@@ -1,6 +1,72 @@
 # Year in Tech
 
-A pipeline that discovers what topics captured outsized attention on Hacker News in a given year and visualizes their attention curves as a ridge plot.
+## Intro:
+Back in 2022 I saw a nice visualization showing [a ridge plot of yearly news](https://github.com/joweich/year-in-search-trends) and I saved it to my phone. Recently I came across it again and decided to recreate it with recent data.
+
+**Problem:** The repo above is for creating a visual from a list of Google Trends keywords, using [pytrends](https://github.com/GeneralMills/pytrends). This approach is labor intensive, prone to omissions and editorial bias; I wanted to do it in a more algorithmic way.
+
+**Solution:** The current project is an unsupervised pipeline that does embedding and clustering on a corpus of text, grouping the posts on semantic proximity using HDBSCAN. This creates topic clusters that are scored, sorted, and plotted for trends. It is done from scratch, patterns emerging from the data without pre-defining topics of interest or using keyword lists.
+
+The clusters that the pipeline generates are of three types - spikes (tied to a specific news event and tightly time-bound), sustained (ongoing discussions throughout the year, e.g. Rust, LLMs), and moderate (things like Google, Apple, nuclear energy - mostly tied to events but there are multiple events in a year).
+
+Attention score is a sum of upvotes and comments. I tried different relative weights for comments vs upvotes (1:2, 1:1, 2:1) and the results are pretty robust, with the top clusters staying largely the same regardless of the coefficients.
+
+Weighing comments more than upvotes would favor ongoing discussion topics over news (sustained over spikes), and vice versa.
+
+**Source:** Google News or Google Trends limit API access to their data, so I went with the HuggingFace archive of [all Hacker News posts since 2006](https://huggingface.co/datasets/open-index/hacker-news). Obviously this biases the topics to tech news; however this pipeline can be applied to any source - my follow up intention is to run it on the Reddit datasets for some of the largest subs like /news and /technology.
+
+**Post processing:** The result is not completely autonomous - there is final manual curation. I chose 20 topics from a list of top 50.
+Here are some of the choices I made.
+- I tried to include representative examples of spikes, moderate, and sustained clusters, as defined above.
+- I omitted items specific to Hacker News, e.g. a monthly thread "Ask HN: What are you working on?"
+- Some clusters were vague, such as "Programming culture & craft" or "Wealth & life choices" - I excluded those; I kept LLMs and Rust (despite being vague) because those were top two topics by attention.
+- From the large cluster of "Notable deaths" I broke out two top scoring topics (David Lynch and Bill Atkinson)
+
+**Top 10 by total attention score:**
+1. LLMs (debate & skepticism)
+2. Rust (adoption & migration)
+3. DeepSeek R1
+4. DOGE & government tech
+5. GPT-4.5 / GPT-5
+6. TikTok US ban
+7. Programming culture & craft
+8. Docker and alternatives
+9. EU Chat Control (encryption)
+10. Claude Code
+
+## 2025 results
+
+![Year in Tech 2025](output/2025_year_in_tech_smooth.png)
+
+The 2025 ridge plot captures 20 topics spanning the year:
+
+- **David Lynch has died** — David Lynch, the visionary filmmaker behind Twin Peaks, Mulholland Drive, and Blue Velvet, died in January 2025.
+- **TikTok US ban** — The US Supreme Court upheld the TikTok ban in January, the app briefly went dark, then was restored after Trump signaled a reprieve. Discussion continued throughout the year around child safety and national security.
+- **DeepSeek R1** — Chinese lab DeepSeek released R1, an open-weight reasoning model that rivaled top Western models at a fraction of the cost. It dominated January headlines amid debates about censorship bypasses and a leaked database.
+- **Pebble smartwatch revival** — Google open-sourced the Pebble OS and new PebbleOS watches were announced, reviving the beloved smartwatch brand years after its original shutdown.
+- **Apple vs UK encryption backdoor** — The UK government secretly ordered Apple to create a global iCloud encryption backdoor. Apple pulled its data protection tool from the UK market rather than comply, and France publicly rejected a similar mandate.
+- **DOGE & government tech** — Elon Musk's Department of Government Efficiency (DOGE) drew sustained attention as young, inexperienced engineers gained "god mode" access to government systems. Whistleblowers alleged sensitive data was taken from agencies like the NLRB.
+- **Signal & government leaks** — A journalist was accidentally added to a Signal group chat with US national security leaders planning military operations. The incident triggered scrutiny of Signal's security model and the discovery that Trump officials were using a compromised Signal clone.
+- **Rust (adoption & migration)** — Rust's role in systems programming was hotly debated all year. High-profile posts about migrating away from Rust sat alongside Greg Kroah-Hartman endorsing Rust in the Linux kernel, reflecting a community in active transition.
+- **Bill Atkinson has died** — Bill Atkinson, creator of MacPaint, HyperCard, and key member of the original Macintosh team, died in June 2025.
+- **LLMs (debate & skepticism)** — LLM skepticism and debate sustained all year — from arguments that LLMs can't really build software, to studies showing they reduce public knowledge sharing, to philosophical posts about AI inevitabilism.
+- **EU age verification** — The EU proposed an age verification app that would effectively ban Android systems not licensed by Google. Critics saw it as both a privacy threat and an antitrust issue, with Discord implementing face-scanning age checks.
+- **GrapheneOS** — GrapheneOS, a privacy-focused Android fork, gained attention as France threatened its developers with arrest over refusing backdoors, while users debated it as the only Android OS providing full security patches.
+- **GPT-4.5 / GPT-5** — OpenAI released GPT-4.5, GPT-4.1, and GPT-5 throughout the year, each drawing intense discussion about capabilities, pricing, and the sycophancy problem in GPT-4o.
+- **Android developer verification** — Google announced that Android would only allow apps from verified developers, prompting backlash from the F-Droid community and open-source advocates who saw it as a threat to sideloading.
+- **Claude Code** — Anthropic's Claude Code tool — an agentic coding assistant — entered beta and saw rapid adoption, with users reporting it could modernize legacy codebases and handle complex multi-file tasks autonomously.
+- **EU Chat Control (encryption)** — The EU's Chat Control proposal to scan all private messages, including in encrypted apps, faced sustained opposition. Germany led the blocking minority, but the proposal kept returning in modified forms.
+- **Apple M5 / Mac hardware** — Apple launched the M5 chip and updated MacBook Pro lineup. Discussion centered on benchmarks, the x86-to-ARM performance gap, and whether Intel and AMD could catch up.
+- **uv (Python packaging)** — Astral's uv, a Rust-based Python package manager, was widely praised as the best thing to happen to the Python ecosystem in a decade, with rapid adoption and enthusiastic migration guides.
+- **Valve / Steam Machine** — Valve announced the Steam Machine console and Steam Frame handheld, positioning itself as the architect behind bringing Windows games to ARM. Linux gaming crossed the 3% Steam market share milestone.
+- **Vibe coding** — "Vibe coding" — using LLMs to generate entire programs from natural language prompts — became a widespread meme and practice, sparking debate about whether it's the future of programming or a recipe for unmaintainable code.
+
+## 2024 results
+
+See [2024 ridge plot](output/2024_year_in_tech_smooth_2x_likes.png) and `data/curated/2024_ai_curated_topics.csv` for the full 2024 analysis.
+
+___
+___
 
 ## How it works
 
@@ -49,37 +115,6 @@ Curation is intentionally manual: scan the list, merge topics that overlap, shor
 
 The final output is a ridge plot where each row is a topic's weekly attention curve, ordered chronologically by peak week. Topics are colored on a cool-to-warm gradient (January = blue, December = red). Gaussian smoothing (σ=1.0) removes weekly jitter while preserving spike character.
 
-## 2025 results
-
-![Year in Tech 2025](output/2025_year_in_tech_smooth.png)
-
-The 2025 ridge plot captures 20 topics spanning the year:
-
-- **David Lynch has died** — David Lynch, the visionary filmmaker behind Twin Peaks, Mulholland Drive, and Blue Velvet, died in January 2025.
-- **TikTok US ban** — The US Supreme Court upheld the TikTok ban in January, the app briefly went dark, then was restored after Trump signaled a reprieve. Discussion continued throughout the year around child safety and national security.
-- **DeepSeek R1** — Chinese lab DeepSeek released R1, an open-weight reasoning model that rivaled top Western models at a fraction of the cost. It dominated January headlines amid debates about censorship bypasses and a leaked database.
-- **Pebble smartwatch revival** — Google open-sourced the Pebble OS and new PebbleOS watches were announced, reviving the beloved smartwatch brand years after its original shutdown.
-- **Apple vs UK encryption backdoor** — The UK government secretly ordered Apple to create a global iCloud encryption backdoor. Apple pulled its data protection tool from the UK market rather than comply, and France publicly rejected a similar mandate.
-- **DOGE & government tech** — Elon Musk's Department of Government Efficiency (DOGE) drew sustained attention as young, inexperienced engineers gained "god mode" access to government systems. Whistleblowers alleged sensitive data was taken from agencies like the NLRB.
-- **Signal & government leaks** — A journalist was accidentally added to a Signal group chat with US national security leaders planning military operations. The incident triggered scrutiny of Signal's security model and the discovery that Trump officials were using a compromised Signal clone.
-- **Rust (adoption & migration)** — Rust's role in systems programming was hotly debated all year. High-profile posts about migrating away from Rust sat alongside Greg Kroah-Hartman endorsing Rust in the Linux kernel, reflecting a community in active transition.
-- **Bill Atkinson has died** — Bill Atkinson, creator of MacPaint, HyperCard, and key member of the original Macintosh team, died in June 2025.
-- **LLMs (debate & skepticism)** — LLM skepticism and debate sustained all year — from arguments that LLMs can't really build software, to studies showing they reduce public knowledge sharing, to philosophical posts about AI inevitabilism.
-- **EU age verification** — The EU proposed an age verification app that would effectively ban Android systems not licensed by Google. Critics saw it as both a privacy threat and an antitrust issue, with Discord implementing face-scanning age checks.
-- **GrapheneOS** — GrapheneOS, a privacy-focused Android fork, gained attention as France threatened its developers with arrest over refusing backdoors, while users debated it as the only Android OS providing full security patches.
-- **GPT-4.5 / GPT-5** — OpenAI released GPT-4.5, GPT-4.1, and GPT-5 throughout the year, each drawing intense discussion about capabilities, pricing, and the sycophancy problem in GPT-4o.
-- **Android developer verification** — Google announced that Android would only allow apps from verified developers, prompting backlash from the F-Droid community and open-source advocates who saw it as a threat to sideloading.
-- **Claude Code** — Anthropic's Claude Code tool — an agentic coding assistant — entered beta and saw rapid adoption, with users reporting it could modernize legacy codebases and handle complex multi-file tasks autonomously.
-- **EU Chat Control (encryption)** — The EU's Chat Control proposal to scan all private messages, including in encrypted apps, faced sustained opposition. Germany led the blocking minority, but the proposal kept returning in modified forms.
-- **Apple M5 / Mac hardware** — Apple launched the M5 chip and updated MacBook Pro lineup. Discussion centered on benchmarks, the x86-to-ARM performance gap, and whether Intel and AMD could catch up.
-- **uv (Python packaging)** — Astral's uv, a Rust-based Python package manager, was widely praised as the best thing to happen to the Python ecosystem in a decade, with rapid adoption and enthusiastic migration guides.
-- **Valve / Steam Machine** — Valve announced the Steam Machine console and Steam Frame handheld, positioning itself as the architect behind bringing Windows games to ARM. Linux gaming crossed the 3% Steam market share milestone.
-- **Vibe coding** — "Vibe coding" — using LLMs to generate entire programs from natural language prompts — became a widespread meme and practice, sparking debate about whether it's the future of programming or a recipe for unmaintainable code.
-
-## 2024 results
-
-See [2024 ridge plot](output/2024_year_in_tech_smooth_2x_likes.png) and `data/curated/2024_ai_curated_topics.csv` for the full 2024 analysis.
-
 ## Adapting this to other data
 
 The pipeline is source-agnostic in design. To apply it to a different dataset:
@@ -101,7 +136,7 @@ The embedding, clustering, scoring, and visualization phases work unchanged on a
 
 ## Setup and usage
 
-Requires Python 3.10+ and the [toolkit](https://github.com/your-org/toolkit) sibling project installed as an editable package.
+Requires Python 3.10+ and the [toolkit](https://github.com/LesTP/toolkit) sibling project installed as an editable package.
 
 ```bash
 pip install -r requirements.txt
