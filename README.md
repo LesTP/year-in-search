@@ -7,11 +7,9 @@ Back in 2022 I saw a nice visualization showing [a ridge plot of yearly news](ht
 
 **Solution:** The current project is an unsupervised pipeline that does embedding and clustering on a corpus of text, grouping the posts on semantic proximity using HDBSCAN. This creates topic clusters that are scored, sorted, and plotted for trends. It is done from scratch, patterns emerging from the data without pre-defining topics of interest or using keyword lists.
 
-The clusters that the pipeline generates are of three types - spikes (tied to a specific news event and tightly time-bound), sustained (ongoing discussions throughout the year, e.g. Rust, LLMs), and moderate (things like Google, Apple, nuclear energy - mostly tied to events but there are multiple events in a year).
+**Comments:** The clusters that the pipeline generates are of three types - spikes (tied to a specific news event and tightly time-bound), sustained (ongoing discussions throughout the year, e.g. Rust, LLMs), and moderate (things like Google, Apple, nuclear energy - mostly tied to events but there are multiple events in a year).
 
-Attention score is a sum of upvotes and comments. I tried different relative weights for comments vs upvotes (1:2, 1:1, 2:1) and the results are pretty robust, with the top clusters staying largely the same regardless of the coefficients.
-
-Weighing comments more than upvotes would favor ongoing discussion topics over news (sustained over spikes), and vice versa.
+Attention score is a sum of upvotes and comments. Weighing comments more than upvotes would favor ongoing discussion topics over news (sustained over spikes), and vice versa. I tried different relative weights for comments vs upvotes (1:2, 1:1, 2:1) and the results are pretty robust, with the top clusters staying largely the same regardless of the coefficients.
 
 **Source:** Google News or Google Trends limit API access to their data, so I went with the HuggingFace archive of [all Hacker News posts since 2006](https://huggingface.co/datasets/open-index/hacker-news). Obviously this biases the topics to tech news; however this pipeline can be applied to any source - my follow up intention is to run it on the Reddit datasets for some of the largest subs like /news and /technology.
 
@@ -36,7 +34,7 @@ Here are some of the choices I made.
 
 ## 2025 results
 
-![Year in Tech 2025](output/2025_year_in_tech_smooth.png)
+![Year in Tech 2025](output_v2/2025_year_in_tech_smooth.png)
 
 The 2025 ridge plot captures 20 topics spanning the year:
 
